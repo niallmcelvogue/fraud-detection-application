@@ -54,6 +54,6 @@ Return all transactions
 ## ✅ TODO List
 
 - [ ] Define user/merchant controller, entity and repository
-- [ ] Add approve/fraudulent logic for when a transaction is marked as flagged
+- [x] Add approve/fraudulent logic for when a transaction is marked as flagged
 - [ ] Add machine learning feature, to detect anomalies in user transactions
 
