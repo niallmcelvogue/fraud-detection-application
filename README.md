@@ -16,10 +16,11 @@ Transactions will be received through the application API, and will be persisted
 Following fraud checks, the transaction will then go into APPROVED or FLAGGED state depending on whether the transaction is deemed to be fraudulent.
 
 **Getting Started**
-1. Clone the repository
+1. Clone the repository and build
 ```bash
    git clone https://github.com/niallmcelvogue/fraud-detection-application.git
    cd fraud-detection-application
+   ./mvnw clean package -DskipTests
   ```
 2. Run with Docker/Podman Compose
 ```bash

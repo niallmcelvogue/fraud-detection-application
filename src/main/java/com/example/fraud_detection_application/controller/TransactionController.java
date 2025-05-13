@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -32,7 +34,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createTransaction(@RequestBody TransactionRequest request) {
+    public ResponseEntity<Transaction> createTransaction(@RequestBody TransactionRequest request) {
         Transaction transaction = new Transaction();
         transaction.setAmount(request.getAmount());
         transaction.setUserId(request.getUserId());
@@ -44,6 +46,27 @@ public class TransactionController {
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         transactionProducer.sendTransaction(savedTransaction);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(savedTransaction);
+    }
+
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<Map<String,String>> markTransactionAsApproved(@PathVariable("id") UUID id) {
+        transactionRepository.findById(id).ifPresent(transaction -> {
+            transaction.setState(TransactionState.APPROVED);
+            transactionRepository.save(transaction);
+        });
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("id", id.toString(),
+                "message", "Transaction marked as approved"));
+    }
+
+    @PatchMapping("/{id}/fraudulent")
+    public ResponseEntity<Map<String,String>> markTransactionAsFraudulent(@PathVariable("id") UUID id) {
+        transactionRepository.findById(id).ifPresent(transaction -> {
+            transaction.setState(TransactionState.FRAUDULENT);
+            transactionRepository.save(transaction);
+        });
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("id", id.toString(),
+                "message", "Transaction marked as fraudulent"));
     }
 }

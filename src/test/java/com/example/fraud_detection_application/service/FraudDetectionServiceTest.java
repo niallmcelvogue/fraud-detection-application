@@ -4,10 +4,10 @@ import com.example.fraud_detection_application.entity.Transaction;
 import com.example.fraud_detection_application.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -20,24 +20,24 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class FraudDetectionServiceTest {
 
-    @MockBean
+    @Mock
     private Clock fixedClock;
 
-    @MockBean
+    @Mock
     private TransactionRepository transactionRepository;
 
-    @Autowired
+    @InjectMocks
     private FraudDetectionService fraudDetectionService;
 
     private final Instant fixedInstant = Instant.parse("2025-05-13T12:00:00Z");
 
     @BeforeEach
     void setUp() {
-        when(fixedClock.instant()).thenReturn(fixedInstant);
-        when(fixedClock.getZone()).thenReturn(ZoneId.of("Europe/London"));
+        lenient().when(fixedClock.instant()).thenReturn(fixedInstant);
+        lenient().when(fixedClock.getZone()).thenReturn(ZoneId.of("Europe/London"));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class FraudDetectionServiceTest {
         Transaction newTransaction = createTransaction(userId, fixedInstant);
         Boolean isFraudulent = fraudDetectionService.isFraudulent(newTransaction);
 
-        assertTrue(isFraudulent);
+        assertTrue(isFraudulent, "Transaction should be flagged as fraudulent due to rapid transactions");
     }
 
 
